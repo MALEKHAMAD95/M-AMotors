@@ -1,0 +1,578 @@
+<script type="text/javascript">
+  var gk_isXlsx = false;
+  var gk_xlsxFileLookup = {};
+  var gk_fileData = {};
+  function filledCell(cell) {
+    return cell !== "" && cell != null;
+  }
+  function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+      try {
+        var workbook = XLSX.read(gk_fileData[filename], { type: "base64" });
+        var firstSheetName = workbook.SheetNames[0];
+        var worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert sheet to JSON to filter blank rows
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, {
+          header: 1,
+          blankrows: false,
+          defval: "",
+        });
+        // Filter out blank rows (rows where all cells are empty, null, or undefined)
+        var filteredData = jsonData.filter((row) => row.some(filledCell));
+
+        // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+        var headerRowIndex = filteredData.findIndex(
+          (row, index) =>
+            row.filter(filledCell).length >=
+            filteredData[index + 1]?.filter(filledCell).length
+        );
+        // Fallback
+        if (headerRowIndex === -1 || headerRowIndex > 25) {
+          headerRowIndex = 0;
+        }
+
+        // Convert filtered JSON back to CSV
+        var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+        csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+        return csv;
+      } catch (e) {
+        console.error(e);
+        return "";
+      }
+    }
+    return gk_fileData[filename] || "";
+  }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M&A Motors - Premium Car Purchase</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #1a2238;
+        color: #ffffff;
+      }
+      .nav {
+        background: linear-gradient(90deg, #1a2238 0%, #2a3550 100%);
+        transition: background-color 0.3s ease;
+      }
+      .nav.scrolled {
+        background-color: #1a2238;
+      }
+      .car-card {
+        background-color: #2a3550;
+        border-radius: 12px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .car-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+      .process-step {
+        background: #2a3550;
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+      }
+      .process-step:hover {
+        transform: translateY(-5px);
+      }
+      .btn-primary {
+        background-color: #4b6bfb;
+        color: white;
+        border-radius: 9999px;
+        padding: 12px 24px;
+        transition: background-color 0.3s ease;
+      }
+      .btn-primary:hover {
+        background-color: #3b5beb;
+      }
+      .back-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #4b6bfb;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        display: none;
+        z-index: 1000;
+      }
+      .back-to-top:hover {
+        background: #3b5beb;
+      }
+      .chat-button {
+        position: fixed;
+        bottom: 20px;
+        right: 80px;
+        background: #9c4bfb;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        z-index: 1000;
+      }
+      .chat-button:hover {
+        background: #8c3beb;
+      }
+      .gradient-text {
+        background: linear-gradient(to right, #4b6bfb, #9c4bfb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .carousel {
+        display: flex;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
+      .carousel-item {
+        min-width: 150px;
+        margin-right: 20px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .carousel-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #4b6bfb;
+        color: white;
+        padding: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+      }
+      .carousel-arrow:hover {
+        background: #3b5beb;
+      }
+      .left-arrow {
+        left: -10px;
+      }
+      .right-arrow {
+        right: -10px;
+      }
+      .logo-img,
+      .body-icon {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+      }
+      .custom-input {
+        background: #2a3550;
+        border: 2px solid #4b6bfb;
+        border-radius: 8px;
+        padding: 10px 12px;
+        color: #ffffff;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      .custom-input:focus {
+        border-color: #9c4bfb;
+        box-shadow: 0 0 8px rgba(75, 107, 251, 0.5);
+        outline: none;
+      }
+      .custom-input::placeholder {
+        color: #a0aec0;
+      }
+      .dropdown {
+        position: absolute;
+        background: #2a3550;
+        border: 1px solid #4b6bfb;
+        border-radius: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        width: 100%;
+        z-index: 10;
+        display: none;
+      }
+      .dropdown-item {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      .dropdown-item:hover {
+        background: #3b5beb;
+      }
+      @media (max-width: 768px) {
+        .nav-menu {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: #1a2238;
+          flex-direction: column;
+          padding: 10px 0;
+        }
+        .nav-menu.active {
+          display: flex;
+        }
+        .nav-toggle {
+          display: block;
+        }
+        .nav-links a {
+          padding: 10px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav
+      class="nav p-4 fixed w-full top-0 z-20 animate__animated animate__fadeInDown"
+      id="navbar"
+    >
+      <div class="container mx-auto flex justify-between items-center">
+        <a href="index.html" class="text-3xl font-bold text-white"
+          ><img src="logo.png" alt="logo" class="logo" style="max-width: 10rem;"></a
+        >
+        <div
+          class="md:flex items-center space-x-6 hidden md:block nav-menu"
+          id="navMenu"
+        >
+          <a
+            href="index.html"
+            class="text-white hover:text-gray-300 transition duration-300 text-lg"
+            >Home</a
+          >
+          <a
+            href="about.html"
+            class="text-white hover:text-gray-300 transition duration-300 text-lg"
+            >About Us</a
+          >
+          <a
+            href="contact.html"
+            class="text-white hover:text-gray-300 transition duration-300 text-lg"
+            >Contact Us</a
+          >
+          <a
+            href="cars.html"
+            class="text-white hover:text-gray-300 transition duration-300 text-lg"
+            >Available Cars</a
+          >
+          <a
+            href="request.html"
+            class="text-white hover:text-gray-300 transition duration-300 text-lg"
+            >Request Car</a
+          >
+          <a
+            href="tel:+3439977144"
+            class="text-white hover:text-gray-300 transition duration-300 text-lg"
+            >(343) 997-7144</a
+          >
+        </div>
+        <div class="md:hidden">
+          <button
+            id="navToggle"
+            class="nav-toggle text-white focus:outline-none"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section with Search Form -->
+    <section
+      class="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#1A2238] to-[#2A3550] pt-20"
+    >
+      <div class="container mx-auto px-4 flex flex-col items-center">
+        <h1
+          class="text-5xl md:text-6xl font-bold text-center mb-6 animate__animated animate__fadeInUp"
+        >
+          Find Your <span class="gradient-text">Dream Car</span> in Canada
+        </h1>
+        <p
+          class="text-lg text-gray-400 text-center mb-10 max-w-2xl animate__animated animate__fadeInUp animate__delay-1s"
+        >
+Available Cars 
+        </p>
+
+        <style>
+          @keyframes float {
+            0% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-20px);
+            }
+            100% {
+              transform: translateY(0px);
+            }
+          }
+          .floating {
+            animation: float 6s ease-in-out infinite;
+          }
+          .floating-slow {
+            animation: float 8s ease-in-out infinite;
+          }
+          .floating-slower {
+            animation: float 10s ease-in-out infinite;
+          }
+        </style>
+
+        <div>
+          <!-- Main Content -->
+          <div class="flex-grow flex items-center relative overflow-hidden">
+            <!-- Background Elements -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+              <div
+                class="absolute top-20 left-10 w-20 h-20 rounded-full bg-indigo-500 opacity-20 floating"
+              ></div>
+              <div
+                class="absolute top-40 right-20 w-32 h-32 rounded-full bg-purple-500 opacity-20 floating-slow"
+              ></div>
+              <div
+                class="absolute bottom-20 left-1/4 w-24 h-24 rounded-full bg-pink-500 opacity-20 floating-slower"
+              ></div>
+              <div
+                class="absolute top-1/3 right-1/3 w-16 h-16 rounded-full bg-indigo-300 opacity-20 floating"
+              ></div>
+            </div>
+
+            <div class="container mx-auto px-4 py-12 relative z-10">
+              <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="text-center md:text-left">
+                  <h1
+                    class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+                  >
+                    Something
+                    <span
+                      class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400"
+                      >Amazing</span
+                    >
+                    is Coming Soon
+                  </h1>
+                  <p
+                    class="text-lg md:text-xl text-indigo-200 mb-8 max-w-lg mx-auto md:mx-0"
+                  >
+                    We're working hard to bring you our new platform. Sign up to
+                    be the first to know when we launch and get exclusive early
+                    access.
+                  </p>
+
+                  <!-- Countdown Timer -->
+                  <div
+                    class="grid grid-cols-4 gap-4 max-w-md mx-auto md:mx-0 mb-10"
+                  >
+                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                      <div class="text-3xl md:text-4xl font-bold">15</div>
+                      <div class="text-indigo-300 text-sm">Days</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                      <div class="text-3xl md:text-4xl font-bold">08</div>
+                      <div class="text-indigo-300 text-sm">Hours</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                      <div class="text-3xl md:text-4xl font-bold">23</div>
+                      <div class="text-indigo-300 text-sm">Minutes</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                      <div class="text-3xl md:text-4xl font-bold">42</div>
+                      <div class="text-indigo-300 text-sm">Seconds</div>
+                    </div>
+                  </div>
+
+                  <!-- Newsletter Signup -->
+                  <div class="max-w-md mx-auto md:mx-0">
+                    <form class="flex flex-col sm:flex-row gap-3">
+                      <input
+                        type="email"
+                        placeholder="Enter your email"
+                        class="flex-grow px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white/10 backdrop-blur-sm border border-white/20"
+                      />
+                      <button
+                        type="submit"
+                        class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 rounded-lg font-medium transition-all duration-200 whitespace-nowrap"
+                      >
+                        Notify Me
+                      </button>
+                    </form>
+                    <p class="text-xs text-indigo-300 mt-3">
+                      We respect your privacy. No spam, ever. Unsubscribe
+                      anytime.
+                    </p>
+                  </div>
+
+                  <!-- Social Media -->
+                  <div
+                    class="mt-10 flex justify-center md:justify-start space-x-6"
+                  >
+                    <a
+                      href="#"
+                      class="text-indigo-300 hover:text-white transition-colors duration-200"
+                    >
+                      <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a
+                      href="#"
+                      class="text-indigo-300 hover:text-white transition-colors duration-200"
+                    >
+                      <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a
+                      href="#"
+                      class="text-indigo-300 hover:text-white transition-colors duration-200"
+                    >
+                      <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a
+                      href="#"
+                      class="text-indigo-300 hover:text-white transition-colors duration-200"
+                    >
+                      <i class="fab fa-linkedin-in text-xl"></i>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Illustration -->
+                <div class="hidden md:block">
+                  <div class="relative">
+                    <div
+                      class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full opacity-20 blur-3xl"
+                    ></div>
+                    <img
+                      src="https://cdn.pixabay.com/photo/2018/11/29/21/51/social-media-3846597_1280.png"
+                      alt="Illustration"
+                      class="relative z-10 mx-auto floating-slow"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#1A2238] py-12">
+      <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-2xl font-bold text-white mb-4">M&A Motors</h3>
+          <p class="text-gray-400">
+            Your go-to platform to find high-quality pre-owned cars in Canada.
+            M&A Motors is Canada's leading website to find and finance your next
+            car.
+          </p>
+
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-white mb-4">Useful Links</h3>
+          <ul class="space-y-2">
+            <li>
+              <a
+                href="cars.html"
+                class="text-gray-400 hover:text-[#4B6BFB] transition duration-300"
+                >See All Cars</a
+              >
+            </li>
+            <li>
+              <a
+                href="about.html"
+                class="text-gray-400 hover:text-[#4B6BFB] transition duration-300"
+                >About Us</a
+              >
+            </li>
+            <li>
+              <a
+                href="faq.html"
+                class="text-gray-400 hover:text-[#4B6BFB] transition duration-300"
+                >FAQ</a
+              >
+            </li>
+            <li>
+              <a
+                href="financing.html"
+                class="text-gray-400 hover:text-[#4B6BFB] transition duration-300"
+                >Financing a Car</a
+              >
+            </li>
+            <li>
+              <a
+                href="policy.html"
+                class="text-gray-400 hover:text-[#4B6BFB] transition duration-300"
+                ></a
+              >
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-white mb-4">Follow Us</h3>
+          <div class="flex space-x-4">
+            <a
+              href="https://whatsapp.com"
+              class="text-[#4B6BFB] hover:text-[#3B5BEB]"
+              ><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 0C5.373 0 0 5.373 0 12c0 2.134.566 4.24 1.632 6.07L0 24l6.068-1.593A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22.001c-1.873 0-3.65-.52-5.177-1.43l-.373-.222-3.602.945.966-3.53-.233-.374C2.52 15.852 2 14.075 2 12.001 2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10.001-10 10.001zm5.884-6.584l-1.252-.752a.833.833 0 00-.834-.052l-.315.157a5.833 5.833 0 01-2.67-.667 5.833 5.833 0 01-1.918-1.918 5.833 5.833 0 01-.667-2.67l.157-.315a.833.833 0 00-.052-.834l-.752-1.252a.833.833 0 00-.708-.375h-.834a.833.833 0 00-.833.833c0 2.5 1.25 4.584 3.334 5.834 2.083 1.25 4.584 1.25 5.834 0a.833.833 0 00.833-.833v-.834a.833.833 0 00-.375-.708z"
+                /></svg></a
+            ><a
+              href="https://instagram.com"
+              class="text-[#4B6BFB] hover:text-[#3B5BEB]"
+              ><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.326 3.608 1.301.975.975 1.24 2.242 1.301 3.608.058 1.266.069 1.646.069 4.85s-.012 3.584-.07 4.85c-.062 1.366-.326 2.633-1.301 3.608-.975.975-2.242 1.24-3.608 1.301-1.266.058-1.646.069-4.85.069s-3.584-.012-4.85-.07c-1.366-.062-2.633-.326-3.608-1.301-.975-.975-1.24-2.242-1.301-3.608-.058-1.266-.069-1.646-.069-4.85s.012-3.584.07-4.85c.062-1.366.326-2.633 1.301-3.608.975-.975 2.242-1.24 3.608-1.301 1.266-.058 1.646-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-1.453.066-2.747.354-3.787 1.394s-1.328 2.334-1.394 3.787c-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.066 1.453.354 2.747 1.394 3.787s2.334 1.328 3.787 1.394c1.28.058 1.688.072 4.947.072s3.667-.014 4.947-.072c1.453-.066 2.747-.354 3.787-1.394s1.328-2.334 1.394-3.787c.058-1.28.072-1.688.072-4.947s-.014-3.667-.072-4.947c-.066-1.453-.354-2.747-1.394-3.787s-2.334-1.328-3.787-1.394c-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.405 0-6.162 2.757-6.162 6.162s2.757 6.162 6.162 6.162 6.162-2.757 6.162-6.162-2.757-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.441s.645 1.441 1.441 1.441 1.441-.645 1.441-1.441-.645-1.441-1.441-1.441z"
+                /></svg></a
+            ><a
+              href="https://facebook.com"
+              class="text-[#4B6BFB] hover:text-[#3B5BEB]"
+              ><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"
+                /></svg
+            ></a>
+          </div>
+          <p class="mt-4 text-gray-400">
+            Need help? Call us on
+            <a href="tel:+3439977144" class="text-[#4B6BFB] hover:underline"
+              >(343) 997-7144</a
+            >
+          </p>
+        </div>
+      </div>
+      <div
+        class="mt-8 border-t border-gray-700 pt-4 text-center text-gray-500 text-sm"
+      >
+        <p>
+          © 2025 M&A  •
+          <a href="#" class="hover:text-[#4B6BFB]">Terms and Conditions</a> •
+          <a href="#" class="hover:text-[#4B6BFB]">Privacy Policy</a>
+        </p>
+      </div>
+    </footer>
+
+    
+      <!-- <a href="https://whatsapp.com" class="chat-button">Chat</a> -->
+
+ 
+  </body>
+</html>

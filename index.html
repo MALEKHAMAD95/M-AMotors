@@ -1,0 +1,1000 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M&A Motors - Premium Car Purchase</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #1A2238;
+      color: #ffffff;
+    }
+    .nav {
+      background: linear-gradient(90deg, #1A2238 0%, #2A3550 100%);
+      transition: background-color 0.3s ease;
+    }
+    .nav.scrolled {
+      background-color: #1A2238;
+    }
+    .car-card {
+      background-color: #2A3550;
+      border-radius: 12px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .car-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    .process-step {
+      background: #2A3550;
+      border-radius: 12px;
+      transition: transform 0.3s ease;
+    }
+    .process-step:hover {
+      transform: translateY(-5px);
+    }
+    .btn-primary {
+      background-color: #4B6BFB;
+      color: white;
+      border-radius: 9999px;
+      padding: 12px 24px;
+      transition: background-color 0.3s ease;
+    }
+    .btn-primary:hover {
+      background-color: #3B5BEB;
+    }
+    .back-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4B6BFB;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 50px;
+      display: none;
+      z-index: 1000;
+    }
+    .back-to-top:hover {
+      background: #3B5BEB;
+    }
+    .chat-button {
+      position: fixed;
+      bottom: 20px;
+      right: 80px;
+      background: #9C4BFB;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 50px;
+      z-index: 1000;
+    }
+    .chat-button:hover {
+      background: #8C3BEB;
+    }
+    .gradient-text {
+      background: linear-gradient(to right, #4B6BFB, #9C4BFB);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .carousel {
+      display: flex;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+    .carousel-item {
+      min-width: 150px;
+      margin-right: 20px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #4B6BFB;
+      color: white;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .carousel-arrow:hover {
+      background: #3B5BEB;
+    }
+    .left-arrow {
+      left: -10px;
+    }
+    .right-arrow {
+      right: -10px;
+    }
+    .logo-img, .body-icon {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+    .custom-input {
+      background: #2A3550;
+      border: 2px solid #4B6BFB;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #ffffff;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .custom-input:focus {
+      border-color: #9C4BFB;
+      box-shadow: 0 0 8px rgba(75, 107, 251, 0.5);
+      outline: none;
+    }
+    .custom-input::placeholder {
+      color: #A0AEC0;
+    }
+    .dropdown {
+      position: absolute;
+      background: #2A3550;
+      border: 1px solid #4B6BFB;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      width: 100%;
+      z-index: 10;
+      display: none;
+    }
+    .dropdown-item {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .dropdown-item:hover {
+      background: #3B5BEB;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* Range Slider Styles */
+    .range-slider {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .range-slider input[type="range"] {
+      position: absolute;
+      width: 100%;
+      height: 8px;
+      pointer-events: none;
+      appearance: none;
+      background: none;
+      z-index: 20;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .range-slider input[type="range"]::-webkit-slider-thumb {
+      pointer-events: all;
+      width: 24px;
+      height: 24px;
+      -webkit-appearance: none;
+    }
+    .range-track {
+      position: relative;
+      height: 8px;
+      z-index: 10;
+    }
+    .range-track-bg {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: #4A5568;
+      border-radius: 4px;
+      z-index: 10;
+    }
+    .range-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background: #4B6BFB;
+      border-radius: 4px;
+      z-index: 20;
+    }
+    .range-handle-min,
+    .range-handle-max {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: #4B6BFB;
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+    }
+    .range-handle-min {
+      margin-left: -4px;
+    }
+    .range-handle-max {
+      margin-right: -12px;
+    }
+    .range-values {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+    }
+    .range-values input {
+      width: 96px;
+      text-align: center;
+      background: #2A3550;
+      border: 2px solid #4A5568;
+      border-radius: 8px;
+      color: #ffffff;
+      padding: 8px;
+    }
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #1A2238;
+        flex-direction: column;
+        padding: 10px 0;
+      }
+      .nav-menu.active {
+        display: flex;
+      }
+      .nav-toggle {
+        display: block;
+      }
+      .nav-links a {
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav p-4 fixed w-full top-0 z-20 animate__animated animate__fadeInDown" id="navbar">
+    <div class="container mx-auto flex justify-between items-center">
+      <a href="index.html" class="text-3xl font-bold text-white"><img src="logo.png" alt="logo" class="logo" style="max-width: 10rem;"></a>
+
+      <div class="md:flex items-center space-x-6 hidden md:block nav-menu" id="navMenu">
+        <a href="index.html" class="text-white hover:text-gray-300 transition duration-300 text-lg">Home</a>
+        <a href="about.html" class="text-white hover:text-gray-300 transition duration-300 text-lg">About Us</a>
+        <a href="contact.html" class="text-white hover:text-gray-300 transition duration-300 text-lg">Contact Us</a>
+        <a href="cars.html" class="text-white hover:text-gray-300 transition duration-300 text-lg">Available Cars</a>
+        <a href="request.html" class="text-white hover:text-gray-300 transition duration-300 text-lg">Request Car</a>
+        <a href="tel:+3439977144" class="text-white hover:text-gray-300 transition duration-300 text-lg">(343) 997-7144</a>
+      </div>
+      <div class="md:hidden">
+        <button id="navToggle" class="nav-toggle text-white focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section with Search Form -->
+ 
+<!-- Hero Section with Search Form -->
+<section class="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#1A2238] to-[#2A3550] pt-20">
+  <div class="container mx-auto px-4 flex flex-col items-center">
+    <h1 class="text-5xl md:text-6xl font-bold text-center mb-6 animate__animated animate__fadeInUp">
+      Find Your <span class="gradient-text">Dream Car</span> in Canada
+    </h1>
+    <p class="text-lg text-gray-400 text-center mb-10 max-w-2xl animate__animated animate__fadeInUp animate__delay-1s">
+      Discover the best pre-owned cars with M&A Motors. Search, finance, and drive your dream car today!
+    </p>
+    <div class="bg-[#2A3550] p-6 rounded-lg shadow-lg w-full max-w-4xl animate__animated animate__fadeInUp animate__delay-2s">
+      <form id="carSearchForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300" for="customerName">Customer Name *</label>
+          <input type="text" id="customerName" name="customerName" placeholder="e.g., John Doe" class="custom-input w-full focus:outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300" for="customerEmail">Customer Email *</label>
+          <input type="email" id="customerEmail" name="customerEmail" placeholder="e.g., john@example.com" class="custom-input w-full focus:outline-none" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300" for="customerPhone">Customer Phone *</label>
+          <input type="tel" id="customerPhone" name="customerPhone" placeholder="e.g., 416-123-4567" class="custom-input w-full focus:outline-none" required>
+        </div>
+        <div style="display: block; position: relative; z-index: 55;">
+          <label class="block text-sm font-medium text-gray-300" for="brand">Brand *</label>
+          <input type="text" id="brandInput" name="brand" placeholder="e.g., Toyota" class="custom-input w-full focus:outline-none" required>
+          <div id="brandDropdown" class="dropdown"></div>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-300">Year *</label>
+          <div class="range-slider" id="yearRangeSlider">
+            <input type="range" min="1980" max="2025" step="1" value="2000" id="yearMinRange">
+            <input type="range" min="1980" max="2025" step="1" value="2025" id="yearMaxRange">
+            <div class="range-track">
+              <div class="range-track-bg"></div>
+              <div class="range-fill" id="yearRangeFill"></div>
+              <div class="range-handle-min" id="yearHandleMin"></div>
+              <div class="range-handle-max" id="yearHandleMax"></div>
+            </div>
+            <div class="range-values">
+              <input type="text" id="yearMinInput" maxlength="4">
+              <input type="text" id="yearMaxInput" maxlength="4">
+            </div>
+          </div>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-300">Price (CAD) *</label>
+          <div class="range-slider" id="priceRangeSlider">
+            <input type="range" min="1000" max="99999" step="1" value="1000" id="priceMinRange">
+            <input type="range" min="1000" max="99999" step="1" value="99999" id="priceMaxRange">
+            <div class="range-track">
+              <div class="range-track-bg"></div>
+              <div class="range-fill" id="priceRangeFill"></div>
+              <div class="range-handle-min" id="priceHandleMin"></div>
+              <div class="range-handle-max" id="priceHandleMax"></div>
+            </div>
+            <div class="range-values">
+              <input type="text" id="priceMinInput" maxlength="5">
+              <input type="text" id="priceMaxInput" maxlength="5">
+            </div>
+          </div>
+        </div>
+        <div class="md:col-span-2">
+          <button type="button" class="btn-primary w-full" onclick="document.getElementById('additionalDetails').classList.toggle('active')">Additional Details</button>
+        </div>
+        <div id="additionalDetails" class="tab-content md:col-span-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-300" for="model">Model</label>
+            <input type="text" id="model" name="model" placeholder="e.g., Camry" class="custom-input w-full focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300" for="mileageMin">Mileage Min (KM)</label>
+            <input type="number" id="mileageMin" name="mileageMin" placeholder="e.g., 0" class="custom-input w-full focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300" for="mileageMax">Mileage Max (KM)</label>
+            <input type="number" id="mileageMax" name="mileageMax" placeholder="e.g., 100000" class="custom-input w-full focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300" for="transmission">Transmission</label>
+            <select id="transmission" name="transmission" class="custom-input w-full focus:outline-none">
+              <option value="">Select</option>
+              <option value="automatic">Automatic</option>
+              <option value="manual">Manual</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300" for="drivetrain">Drivetrain</label>
+            <select id="drivetrain" name="drivetrain" class="custom-input w-full focus:outline-none">
+              <option value="">Select</option>
+              <option value="fwd">FWD</option>
+              <option value="rwd">RWD</option>
+              <option value="awd">AWD</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300" for="seats">Seats</label>
+            <input type="number" id="seats" name="seats" placeholder="e.g., 5" class="custom-input w-full focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300" for="features">Features</label>
+            <select id="features" name="features" multiple class="custom-input w-full focus:outline-none">
+              <option value="ac">AC</option>
+              <option value="sunroof">Sunroof</option>
+              <option value="nav">Navigation</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300" for="termYears">Term Years</label>
+            <input type="number" id="termYears" name="termYears" placeholder="e.g., 3" class="custom-input w-full focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300" for="maxMonthly">Max Monthly (CAD)</label>
+            <input type="number" id="maxMonthly" name="maxMonthly" placeholder="e.g., 500" class="custom-input w-full focus:outline-none">
+          </div>
+        </div>
+        <div class="md:col-span-2 flex space-x-4">
+          <button type="button" class="btn-primary w-full" onclick="sendEmail()">Send By Email</button>
+          <button type="button" class="btn-primary w-full" onclick="sendWhatsApp()">Send By WhatsApp</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+  <!-- Benefits Section -->
+  <section class="bg-[#2A3550] py-16">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="flex items-center space-x-4 animate__animated animate__fadeIn"><img src="https://img.icons8.com/ios-filled/50/4B6BFB/diamond.png" alt="Best Value" class="w-8 h-8"><p class="text-sm">Best Value Guarantee</p></div>
+        <div class="flex items-center space-x-4 animate__animated animate__fadeIn"><img src="https://img.icons8.com/ios-filled/50/4B6BFB/car-check.png" alt="Cars Inspected" class="w-8 h-8"><p class="text-sm">Cars Fully Inspected</p></div>
+        <div class="flex items-center space-x-4 animate__animated animate__fadeIn"><img src="https://img.icons8.com/ios-filled/50/4B6BFB/home.png" alt="Delivered" class="w-8 h-8"><p class="text-sm">Delivered to Your Doorstep</p></div>
+        <div class="flex items-center space-x-4 animate__animated animate__fadeIn"><img src="https://img.icons8.com/ios-filled/50/4B6BFB/money.png" alt="Financing" class="w-8 h-8"><p class="text-sm">Flexible Financing</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Cars Section -->
+  <section class="container mx-auto py-20 px-4">
+    <h2 class="text-4xl font-bold text-center mb-12 animate__animated animate__fadeInUp">Our <span class="gradient-text">Premium Collection</span></h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="car-card p-4"><img src="https://robbreport.com/wp-content/uploads/2024/10/2006-escalade-feature-e1730317391943.jpg?w=1024" alt="Car 1" class="w-full h-48 object-cover rounded-lg mb-4"><h3 class="text-xl font-semibold text-white">Cadillac Escalade</h3><p class="text-gray-400">2017 | 6.2L | 91,000 KM | CAD 1864/month</p><p class="text-gray-500">SUV | Full Options</p><a href="cars.html" class="text-[#4B6BFB] hover:underline mt-2 block">View Details</a></div>
+      <div class="car-card p-4"><img src="https://images.unsplash.com/photo-1541348263662-e068662d82af?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Car 2" class="w-full h-48 object-cover rounded-lg mb-4"><h3 class="text-xl font-semibold text-white">BMW 218i Gran Coupé</h3><p class="text-gray-400">2021 | 1.5L | 48,000 KM | CAD 1551/month</p><p class="text-gray-500">Sedan | Full Options</p><a href="cars.html" class="text-[#4B6BFB] hover:underline mt-2 block">View Details</a></div>
+      <div class="car-card p-4"><img src="https://images.unsplash.com/photo-1502877338535-766e1452684a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Car 3" class="w-full h-48 object-cover rounded-lg mb-4"><h3 class="text-xl font-semibold text-white">BMW 430i Coupe M Kit</h3><p class="text-gray-400">2018 | 2.0L | 43,000 KM | CAD 1478/month</p><p class="text-gray-500">Coupe | Full Options</p><a href="cars.html" class="text-[#4B6BFB] hover:underline mt-2 block">View Details</a></div>
+      <div class="car-card p-4"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Car 4" class="w-full h-48 object-cover rounded-lg mb-4"><h3 class="text-xl font-semibold text-white">Mercedes-Benz GLE 45</h3><p class="text-gray-400">2020 | 3.0L | 114,000 KM | CAD 2804/month</p><p class="text-gray-500">SUV | Full Options</p><a href="cars.html" class="text-[#4B6BFB] hover:underline mt-2 block">View Details</a></div>
+    </div>
+  </section>
+
+
+    <section class="">
+    <h2 class="text-4xl font-bold text-center mb-12 animate__animated animate__fadeInUp">Our <span class="gradient-text">Premium Collection</span></h2>
+<div class="bg-gradient-to-r from-purple-900 to-indigo-900 py-12 px-4">
+  <div class="max-w-screen-xl mx-auto">
+    <div class="max-w-3xl mx-auto mb-16 text-center">
+      <h2 class="text-white text-3xl lg:text-4xl font-bold text-center mb-4 leading-relaxed">Explore Our Car Search & Trading Features</h2>
+      <p class="text-slate-300 group-hover:text-slate-600 text-sm leading-relaxed">Discover how our platform makes finding and trading your dream car effortless. From personalized searches to seamless transactions, we empower your automotive journey.</p>
+    </div>
+    <div class="grid lg:grid-cols-3 md:grid-cols-2 mx-auto">
+      <div class="rounded-xl group p-8 text-center hover:bg-white text-white hover:text-purple-800 hover:shadow-xl transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-8 mb-6 inline-block" viewBox="0 0 100 100">
+          <path d="M65.156 4.42c-8.327 0-15.13 6.855-15.13 15.202s6.803 15.165 15.13 15.165c7.017 0 12.924-4.863 14.626-11.382h13.843a3.798 3.798 0 0 0 3.791-3.805 3.798 3.798 0 0 0-3.79-3.8h-13.86C78.053 9.294 72.16 4.42 65.156 4.42zM6.391 15.8a3.798 3.798 0 0 0-3.79 3.805 3.798 3.798 0 0 0 3.79 3.8h36.397c-.21-1.234-.348-2.493-.348-3.783 0-1.304.134-2.575.348-3.821zm28.47 18.987c-7.018 0-12.92 4.89-14.619 11.418H6.392a3.783 3.783 0 0 0-.363 0 3.801 3.801 0 0 0-3.52 4.062 3.798 3.798 0 0 0 3.882 3.535H20.25c1.71 6.511 7.604 11.382 14.61 11.382 8.328 0 15.167-6.848 15.167-15.195 0-8.347-6.84-15.202-15.166-15.202zm22.383 11.418c.21 1.234.347 2.494.347 3.784 0 1.3-.134 2.57-.347 3.813h36.381a3.795 3.795 0 0 0 3.874-3.714 3.796 3.796 0 0 0-3.874-3.883H57.244zm7.912 18.979c-8.327 0-15.13 6.855-15.13 15.202S56.83 95.58 65.157 95.58c7.007 0 12.907-4.87 14.618-11.382h13.851a3.796 3.796 0 0 0 3.706-3.883 3.795 3.795 0 0 0-3.706-3.714H79.782c-1.701-6.527-7.608-11.418-14.626-11.418zM6.029 76.602a3.801 3.801 0 0 0-3.52 4.062 3.798 3.798 0 0 0 3.882 3.535h36.412a22.541 22.541 0 0 1-.348-3.813c0-1.29.138-2.55.348-3.784H6.39a3.783 3.783 0 0 0-.362 0z" data-original="#000000" />
+        </svg>
+        <h3 class="text-lg font-semibold mb-3">Vehicle Customization</h3>
+        <p class="text-slate-300 group-hover:text-slate-600 text-sm leading-relaxed">Personalize your car search with filters for brand, model, year, and more to find the perfect vehicle tailored to your needs.</p>
+      </div>
+
+      <div class="rounded-xl group p-8 text-center hover:bg-white text-white hover:text-purple-800 hover:shadow-xl transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-8 mb-6 inline-block" viewBox="0 0 682.667 682.667">
+          <defs>
+            <clipPath id="b" clipPathUnits="userSpaceOnUse">
+              <path d="M0 512h512V0H0Z" data-original="#000000" />
+            </clipPath>
+          </defs>
+          <mask id="a">
+            <rect width="100%" height="100%" fill="#fff" data-original="#ffffff" />
+          </mask>
+          <g mask="url(#a)">
+            <g fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="30" clip-path="url(#b)" transform="matrix(1.33333 0 0 -1.33333 0 682.667)">
+              <path d="M458.172 372.633a533.882 533.882 0 0 0-.474 16.345c-.303 20.475-16.411 37.184-36.856 38.326-62.529 3.493-111.431 24.292-152.737 64.553-6.912 6.336-17.279 6.336-24.191 0-41.306-40.261-90.208-61.06-152.737-64.553-20.445-1.142-36.553-17.851-36.857-38.325a530.642 530.642 0 0 0-.473-16.346C51.549 251.97 48.104 86.598 248.803 16.615a22.014 22.014 0 0 1 2.942-.801l.01-.002a21.72 21.72 0 0 1 8.509 0c1.002.2 1.996.47 2.961.807C463.342 86.602 460.47 251.398 458.172 372.633Z" data-original="#000000" />
+              <path d="M368.408 256c0-62.082-50.327-112.409-112.409-112.409S143.592 193.918 143.592 256c0 62.082 50.327 112.409 112.408 112.409S368.408 318.082 368.408 256Z" data-original="#000000" />
+              <path stroke-linecap="round" d="m303.227 284.952-69.785-69.785M206.773 241.834l26.668-26.668" data-original="#000000" />
+            </g>
+          </g>
+        </svg>
+        <h3 class="text-lg font-semibold mb-3">Secure Transactions</h3>
+        <p class="text-slate-300 group-hover:text-slate-600 text-sm leading-relaxed">Trade with confidence using our secure platform, featuring encrypted payments and verified seller protections.</p>
+      </div>
+
+      <div class="rounded-xl group p-8 text-center hover:bg-white text-white hover:text-purple-800 hover:shadow-xl transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-8 mb-6 inline-block" viewBox="0 0 512 512">
+          <path d="M495.984 252.588c-17.119-14.109-44.177-15.319-61.936 3.74l-44.087 47.327c-5.7-18.319-22.809-31.658-42.977-31.658h-78.675c-5.97 0-7.969-2.28-18.339-10.269-39.538-34.468-98.924-34.358-138.342.33L82.71 287.516c-12.999-6.88-28.178-7.05-41.248-.52L8.294 303.575c-7.41 3.71-10.409 12.719-6.71 20.129l89.995 179.989c3.71 7.41 12.719 10.409 20.129 6.71l33.168-16.589c16.349-8.169 25.448-24.849 24.858-41.827h177.249c32.868 0 64.276-15.699 83.995-41.997l72.006-96.014c13.969-18.61 11.759-45.899-7-61.388zM131.456 466.985l-19.749 9.879-76.585-153.16 19.759-9.879c7.41-3.7 16.409-.71 20.119 6.71l63.166 126.332c3.7 7.409.7 16.408-6.71 20.118zm347.529-171.009L406.98 391.99c-14.089 18.789-36.518 29.998-59.996 29.998H159.265l-56.207-112.423 28.388-24.988c28.248-24.849 70.846-24.849 99.094 0 16.639 14.649 26.988 17.419 37.768 17.419h78.675c8.27 0 14.999 6.73 14.999 14.999s-6.73 14.999-14.999 14.999h-76.605c-8.28 0-14.999 6.72-14.999 14.999s6.72 14.999 14.999 14.999h86.655c12.449 0 24.449-5.22 32.928-14.329l66.036-70.886c6.04-6.48 15.299-5.94 20.979-.97 5.939 5.199 6.58 14.089 2.009 20.169zm-163.6-193.609c10.269-10.769 16.599-25.328 16.599-41.358 0-33.018-26.678-60.996-59.996-60.996-33.068 0-60.996 27.928-60.996 60.996 0 15.539 6.09 30.208 17.149 41.478-27.428 15.379-47.147 44.897-47.147 79.515v14.999c0 8.279 6.72 14.999 14.999 14.999h150.991c8.279 0 14.999-6.72 14.999-14.999v-14.999c-.001-33.938-18.668-63.916-46.598-79.635zm-43.397-72.355c16.259 0 29.998 14.199 29.998 30.998 0 16.539-13.459 29.998-29.998 29.998-16.799 0-30.998-13.739-30.998-29.998 0-16.509 14.489-30.998 30.998-30.998zm-60.996 151.99c0-33.068 27.928-60.996 60.996-60.996 33.078 0 59.996 27.358 59.996 60.996H210.992z" data-original="#000000" />
+        </svg>
+        <h3 class="text-lg font-semibold mb-3">Expert Support</h3>
+        <p class="text-slate-300 group-hover:text-slate-600 text-sm leading-relaxed">Our dedicated team is available 24/7 to guide you through the car search and trading process, ensuring a smooth experience.</p>
+      </div>
+
+      <div class="rounded-xl group p-8 text-center hover:bg-white text-white hover:text-purple-800 hover:shadow-xl transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-8 mb-6 inline-block" viewBox="0 0 512 512">
+          <path d="M451 257v215c0 22.5-14.1 40-32.1 40H375c-18 0-32.1-17.6-32.1-40V257c0-22.5 14.1-40 32.1-40h43.9c17.9 0 32.1 17.6 32.1 40zm.7-126.1c-3 2.1-6.9 2.2-10.1.3l-30-18C362.2 195 292.5 272 157.9 272c-28.4 0-59.7-3.4-94.3-11-5-1.1-8.2-6-7.2-11.1 1-4.6 5.2-7.7 9.9-7.3 8.4.7 203.6 13.8 285.6-166.7L321.2 61c-4.6-2.2-6.6-7.8-4.4-12.4 1-2.1 2.7-3.7 4.8-4.6L423.5.7c4.7-2 10.2.2 12.2 4.9.3.7.5 1.4.6 2.1l19.3 113.9c.7 3.6-.9 7.3-3.9 9.3zM310.1 336v136c0 22.5-14.1 40-32.1 40h-44c-18 0-32.1-17.6-32.1-40V336c0-22.5 14.1-40 32.1-40h43.9c18.1-.1 32.2 17.5 32.2 40zm-137.8 65.8V472c0 22.4-14.1 40-32.1 40h-44c-18 0-32.1-17.6-32.1-40v-70.2c0-22.5 14.1-40 32.1-40h43.9c18.1-.1 32.2 17.5 32.2 40z" data-original="#000000" />
+        </svg>
+        <h3 class="text-lg font-semibold mb-3">Fast Search Performance</h3>
+        <p class="text-slate-300 group-hover:text-slate-600 text-sm leading-relaxed">Find cars quickly with our lightning-fast search engine, delivering results in seconds with no delays.</p>
+      </div>
+
+      <div class="rounded-xl group p-8 text-center hover:bg-white text-white hover:text-purple-800 hover:shadow-xl transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-8 mb-6 inline-block" viewBox="0 0 682.667 682.667">
+          <defs>
+            <clipPath id="a" clipPathUnits="userSpaceOnUse">
+              <path d="M0 512h512V0H0Z" data-original="#000000" />
+            </clipPath>
+          </defs>
+          <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="30" clip-path="url(#a)" transform="matrix(1.33333 0 0 -1.33333 0 682.667)">
+            <path d="M75 467c0-16.568-13.432-30-30-30-16.568 0-30 13.432-30 30 0 16.568 13.432 30 30 30 16.568 0 30-13.432 30-30ZM75 45c0-16.568-13.432-30-30-30-16.568 0-30 13.432-30 30 0 16.568 13.432 30 30 30 16.568 0 30-13.432 30-30ZM497 467c0-16.568-13.432-30-30-30-16.568 0-30 13.432-30 30 0 16.568 13.432 30 30 30 16.568 0 30-13.432 30-30ZM497 45c0-16.568-13.432-30-30-30-16.568 0-30 13.432-30 30 0 16.568 13.432 30 30 30 16.568 0 30-13.432 30-30ZM406 256c0-82.843-67.157-150-150-150s-150 67.157-150 150 67.157 150 150 150 150-67.157 150-150Z" data-original="#000000" />
+            <path d="M316 256c0-82.843-26.863-150-60-150s-60 67.157-60 150 26.863 150 60 150 60-67.157 60-150ZM106 256h300M66.213 445.787l83.721-83.721M445.787 445.787l-83.721-83.721M362.066 149.934l83.721-83.721M149.934 149.934 66.213 66.213" data-original="#000000" />
+          </g>
+        </svg>
+        <h3 class="text-lg font-semibold mb-3">Wide Market Reach</h3>
+        <p class="text-slate-300 group-hover:text-slate-600 text-sm leading-relaxed">Access a vast network of sellers and buyers across Canada, connecting you to the best car deals available.</p>
+      </div>
+
+      <div class="rounded-xl group p-8 text-center hover:bg-white text-white hover:text-purple-800 hover:shadow-xl transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-8 mb-6 inline-block" viewBox="0 0 682.667 682.667">
+          <defs>
+            <clipPath id="a" clipPathUnits="userSpaceOnUse">
+              <path d="M0 512h512V0H0Z" data-original="#000000" />
+            </clipPath>
+          </defs>
+          <g fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="30" clip-path="url(#a)" transform="matrix(1.33 0 0 -1.33 0 682.667)">
+            <path d="M226 15v60c0 16.568-13.432 30-30 30H76c-16.568 0-30-13.432-30-30V15Zm-45 165c0-24.853-20.147-45-45-45s-45 20.147-45 45 20.147 45 45 45 45-20.147 45-45ZM466 15v60c0 16.568-13.432 30-30 30H316c-16.568 0-30-13.432-30-30V15Zm-45 165c0-24.853-20.147-45-45-45s-45 20.147-45 45 20.147 45 45 45 45-20.147 45-45Zm-75 167v-50.294L286 347h-60.002L166 296.706V347h-15c-41.421 0-75 33.579-75 75s33.579 75 75 75h210c41.421 0 75-33.579 75-75s-33.579-75-75-75Zm-105 75h30m-90 0h30m90 0h30" data-original="#000000" />
+          </g>
+        </svg>
+        <h3 class="text-lg font-semibold mb-3">Seamless Communication</h3>
+        <p class="text-slate-300 group-hover:text-slate-600 text-sm leading-relaxed">Connect with sellers and our support team effortlessly via email or WhatsApp for quick responses and updates.</p>
+      </div>
+    </div>
+  </div>
+</div>
+  </section>
+
+
+  <!-- How It Works Section -->
+  <section class="bg-[#2A3550] py-20">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-center mb-12 animate__animated animate__fadeInUp">How It <span class="gradient-text">Works</span></h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="process-step p-6 text-center rounded-lg shadow-md animate__animated animate__fadeInLeft"><img src="https://img.icons8.com/ios-filled/50/FFFFFF/car.png" alt="Tell Us" class="mx-auto mb-4"><h3 class="text-xl font-semibold mb-2">Tell Us About Your Car</h3><p class="text-gray-400">Send your car details and schedule a car inspection.</p></div>
+        <div class="process-step p-6 text-center rounded-lg shadow-md animate__animated animate__fadeInUp"><img src="https://img.icons8.com/ios-filled/50/FFFFFF/money.png" alt="Receive Offer" class="mx-auto mb-4"><h3 class="text-xl font-semibold mb-2">Receive Best Offer</h3><p class="text-gray-400">We promote, handle calls, and negotiate for you.</p></div>
+        <div class="process-step p-6 text-center rounded-lg shadow-md animate__animated animate__fadeInRight"><img src="https://img.icons8.com/ios-filled/50/FFFFFF/checked.png" alt="Get Paid" class="mx-auto mb-4"><h3 class="text-xl font-semibold mb-2">Get Paid</h3><p class="text-gray-400">We guarantee safe payment </p></div>
+      </div>
+      <!-- <div class="text-center mt-8"><a href="how-it-works.html" class="btn-primary">Learn More</a></div> -->
+    </div>
+  </section>
+
+  <!-- Popular Car Brands in Canada -->
+<section class="container mx-auto py-20 px-4">
+  <h2 class="text-4xl font-bold text-center mb-12 animate__animated animate__fadeInUp">Popular <span class="gradient-text">Car Brands</span> in Canada</h2>
+  <div class="relative" >
+    <div class="carousel" id="brandCarousel">
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/toyota.png" alt="Toyota" class="logo-img"><p class="mt-2">Toyota</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/kia.png" alt="Kia" class="logo-img"><p class="mt-2">Kia</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/mercedes-benz.png" alt="Mercedes-Benz" class="logo-img"><p class="mt-2">Mercedes-Benz</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/hyundai.png" alt="Hyundai" class="logo-img"><p class="mt-2">Hyundai</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/mitsubishi.png" alt="Mitsubishi" class="logo-img"><p class="mt-2">Mitsubishi</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/nissan.png" alt="Nissan" class="logo-img"><p class="mt-2">Nissan</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/bmw.png" alt="BMW" class="logo-img"><p class="mt-2">BMW</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/ford.png" alt="Ford" class="logo-img"><p class="mt-2">Ford</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/porsche.png" alt="Porsche" class="logo-img"><p class="mt-2">Porsche</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/lexus.png" alt="Lexus" class="logo-img"><p class="mt-2">Lexus</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/audi.png" alt="Audi" class="logo-img"><p class="mt-2">Audi</p></div>
+      <div class="carousel-item car-card p-4"><img src="https://img.icons8.com/color/50/000000/honda.png" alt="Honda" class="logo-img"><p class="mt-2">Honda</p></div>
+    </div>
+    <button class="carousel-arrow left-arrow" id="brandLeft"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+    <button class="carousel-arrow right-arrow" id="brandRight"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+  </div>
+</section>
+
+
+<!-- Popular Used Cars by Body Type -->
+  <section class="bg-[#2A3550] py-20" style=" display: none; "> 
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-center mb-12 animate__animated animate__fadeInUp">Popular Used Cars by <span class="gradient-text">Body Type</span></h2>
+  <!-- <div class="relative" style="width: 51rem;display: flex;justify-content: center;width: 100%;"> 
+        <div class="carousel" id="bodyTypeCarousel">
+<div class="carousel" id="bodyTypeCarousel">
+  <div class="carousel-item car-card p-4">
+    <img src="https://www.svgrepo.com/show/5487/sedan.svg" alt="Sedan" class="body-icon">
+    <p class="mt-2 text-gray-400">Sedan</p>
+  </div>
+  <div class="carousel-item car-card p-4">
+    <img src="https://uxwing.com/wp-content/themes/uxwing/svg-car-icon/suv-car-icon.svg" alt="SUV" class="body-icon">
+    <p class="mt-2 text-gray-400">SUV</p>
+  </div>
+  <div class="carousel-item car-card p-4">
+    <img src="https://www.svgrepo.com/show/103146/convertible-car.svg" alt="Convertible" class="body-icon">
+    <p class="mt-2 text-gray-400">Convertible</p>
+  </div>
+  <div class="carousel-item car-card p-4">
+    <img src="https://www.svgrepo.com/show/127342/coupe-car.svg" alt="Coupe" class="body-icon">
+    <p class="mt-2 text-gray-400">Coupe</p>
+  </div>
+  <div class="carousel-item car-card p-4">
+    <img src="https://uxwing.com/wp-content/themes/uxwing/svg-car-icon/hatchback-car-icon.svg" alt="Hatchback" class="body-icon">
+    <p class="mt-2 text-gray-400">Hatchback</p>
+  </div>
+  <div class="carousel-item car-card p-4">
+    <img src="https://www.svgrepo.com/show/467152/minivan-car.svg" alt="Minivan" class="body-icon">
+    <p class="mt-2 text-gray-400">Minivan</p>
+  </div>
+  <div class="carousel-item car-card p-4">
+    <img src="https://www.svgrepo.com/show/467146/wagon-car.svg" alt="Wagon" class="body-icon">
+    <p class="mt-2 text-gray-400">Wagon</p>
+  </div>
+</div> -->
+      </div>
+        <button class="carousel-arrow left-arrow" id="bodyTypeLeft"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+        <button class="carousel-arrow right-arrow" id="bodyTypeRight"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- What Our Users Say About Us -->
+  <section class="container mx-auto py-20 px-4">
+    <h2 class="text-4xl font-bold text-center mb-12 animate__animated animate__fadeInUp">What Our <span class="gradient-text">Users Say</span></h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="animate__animated animate__fadeInLeft"><p class="text-gray-400 mb-4">Using M&A Motors's online marketplace, you can sell your car anywhere across Canada and beyond. We connect buyers and sellers nationwide, offering unparalleled access to customers seeking to buy a car like yours.</p><a href="#" class="text-[#4B6BFB] hover:underline">We went an extra mile for them!</a></div>
+      <div class="space-y-6">
+        <div class="car-card p-4 flex items-start space-x-4"><img src="https://img.icons8.com/ios-filled/50/4B6BFB/user-male-circle.png" alt="User" class="w-12 h-12"><div><p class="text-gray-300">Awesome photo service, on time, great pics. Sold within a week!</p><p class="text-[#4B6BFB] mt-2">Steve B.</p></div></div>
+        <div class="car-card p-4 flex items-start space-x-4"><img src="https://img.icons8.com/ios-filled/50/4B6BFB/user-male-circle.png" alt="User" class="w-12 h-12"><div><p class="text-gray-300">M&A Motors photography service was excellent, especially the outdoor shots!</p><p class="text-[#4B6BFB] mt-2">John M.</p></div></div>
+        <div class="car-card p-4 flex items-start space-x-4"><img src="https://img.icons8.com/ios-filled/50/4B6BFB/user-male-circle.png" alt="User" class="w-12 h-12"><div><p class="text-gray-300">Sold my car in just a few hours after listing. Amazing service!</p><p class="text-[#4B6BFB] mt-2">Mike T.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- News & Reviews -->
+  <!-- <section class="bg-[#2A3550] py-20">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-12"><h2 class="text-4xl font-bold animate__animated animate__fadeInUp">News & <span class="gradient-text">Reviews</span></h2><a href="#" class="text-[#4B6BFB] hover:underline">View All</a></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="car-card p-4"><p class="text-gray-300">Top 10 Luxury Cars to Look Out for in 2025</p><p class="text-gray-500 text-sm mt-2">Published on May 20, 2025</p></div>
+        <div class="car-card p-4"><p class="text-gray-300">A Review of the Latest Electric SUVs</p><p class="text-gray-500 text-sm mt-2">Published on May 18, 2025</p></div>
+        <div class="car-card p-4"><p class="text-gray-300">How to Choose the Best Car for Canadian Roads</p><p class="text-gray-500 text-sm mt-2">Published on May 15, 2025</p></div>
+      </div>
+    </div>
+  </section> -->
+
+  <!-- Footer -->
+  <footer class="bg-[#1A2238] py-12">
+    <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div><h3 class="text-2xl font-bold text-white mb-4">M&A Motors</h3><p class="text-gray-400">Your go-to platform to find high-quality pre-owned cars in Canada. M&A Motors is Canada's leading website to find and finance your next car.</p></div>
+      <div><h3 class="text-xl font-bold text-white mb-4">Useful Links</h3><ul class="space-y-2"><li><a href="cars.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300">See All Cars</a></li><li><a href="about.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300">About Us</a></li><li><a href="faq.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300">FAQ</a></li><li><a href="financing.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300">Financing a Car</a></li><li><a href="policy.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300"></a></li></ul></div>
+      <div><h3 class="text-xl font-bold text-white mb-4">Follow Us</h3><div class="flex space-x-4"><a href="https://whatsapp.com" class="text-[#4B6BFB] hover:text-[#3B5BEB]"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.134.566 4.24 1.632 6.07L0 24l6.068-1.593A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22.001c-1.873 0-3.65-.52-5.177-1.43l-.373-.222-3.602.945.966-3.53-.233-.374C2.52 15.852 2 14.075 2 12.001 2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10.001-10 10.001zm5.884-6.584l-1.252-.752a.833.833 0 00-.834-.052l-.315.157a5.833 5.833 0 01-2.67-.667 5.833 5.833 0 01-1.918-1.918 5.833 5.833 0 01-.667-2.67l.157-.315a.833.833 0 00-.052-.834l-.752-1.252a.833.833 0 00-.708-.375h-.834a.833.833 0 00-.833.833c0 2.5 1.25 4.584 3.334 5.834 2.083 1.25 4.584 1.25 5.834 0a.833.833 0 00.833-.833v-.834a.833.833 0 00-.375-.708z"/></svg></a><a href="https://instagram.com" class="text-[#4B6BFB] hover:text-[#3B5BEB]"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.326 3.608 1.301.975.975 1.24 2.242 1.301 3.608.058 1.266.069 1.646.069 4.85s-.012 3.584-.07 4.85c-.062 1.366-.326 2.633-1.301 3.608-.975.975-2.242 1.24-3.608 1.301-1.266.058-1.646.069-4.85.069s-3.584-.012-4.85-.07c-1.366-.062-2.633-.326-3.608-1.301-.975-.975-1.24-2.242-1.301-3.608-.058-1.266-.069-1.646-.069-4.85s.012-3.584.07-4.85c.062-1.366.326-2.633 1.301-3.608.975-.975 2.242-1.24 3.608-1.301 1.266-.058 1.646-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-1.453.066-2.747.354-3.787 1.394s-1.328 2.334-1.394 3.787c-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.066 1.453.354 2.747 1.394 3.787s2.334 1.328 3.787 1.394c1.28.058 1.688.072 4.947.072s3.667-.014 4.947-.072c1.453-.066 2.747-.354 3.787-1.394s1.328-2.334 1.394-3.787c.058-1.28.072-1.688.072-4.947s-.014-3.667-.072-4.947c-.066-1.453-.354-2.747-1.394-3.787s-2.334-1.328-3.787-1.394c-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.405 0-6.162 2.757-6.162 6.162s2.757 6.162 6.162 6.162 6.162-2.757 6.162-6.162-2.757-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.441s.645 1.441 1.441 1.441 1.441-.645 1.441-1.441-.645-1.441-1.441-1.441z"/></svg></a><a href="https://facebook.com" class="text-[#4B6BFB] hover:text-[#3B5BEB]"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg></a></div><p class="mt-4 text-gray-400">Need help? Call us on <a href="tel:+3439977144" class="text-[#4B6BFB] hover:underline">(343) 997-7144</a></p></div>
+    </div>
+    <div class="mt-8 border-t border-gray-700 pt-4 text-center text-gray-500 text-sm"><p>© 2025 M&A  • <a href="#" class="hover:text-[#4B6BFB]">Terms and Conditions</a> • <a href="#" class="hover:text-[#4B6BFB]">Privacy Policy</a></p></div>
+  </footer>
+
+  
+    <!-- <a href="https://whatsapp.com" class="chat-button">Chat</a> -->
+
+
+  <script>
+    // Initialize Range Sliders
+    function initRangeSlider(minRangeId, maxRangeId, fillId, handleMinId, handleMaxId, minInputId, maxInputId, minValue, maxValue, minDefault, maxDefault, minGap) {
+      const minRange = document.getElementById(minRangeId);
+      const maxRange = document.getElementById(maxRangeId);
+      const rangeFill = document.getElementById(fillId);
+      const handleMin = document.getElementById(handleMinId);
+      const handleMax = document.getElementById(handleMaxId);
+      const minInput = document.getElementById(minInputId);
+      const maxInput = document.getElementById(maxInputId);
+
+      minRange.min = minValue;
+      minRange.max = maxValue;
+      maxRange.min = minValue;
+      maxRange.max = maxValue;
+      minRange.value = minDefault;
+      maxRange.value = maxDefault;
+
+      minInput.value = minDefault;
+      maxInput.value = maxDefault;
+
+      function updateSlider() {
+        let minVal = parseInt(minRange.value);
+        let maxVal = parseInt(maxRange.value);
+
+        // Ensure minimum gap and bounds
+        if (maxVal - minVal < minGap) {
+          if (event.target === minRange) {
+            minVal = maxVal - minGap;
+            minRange.value = minVal;
+          } else {
+            maxVal = minVal + minGap;
+            maxRange.value = maxVal;
+          }
+        }
+
+        if (minVal < minValue) {
+          minVal = minValue;
+          minRange.value = minVal;
+        }
+        if (maxVal > maxValue) {
+          maxVal = maxValue;
+          maxRange.value = maxVal;
+        }
+
+        // Calculate percentages for fill and handles
+        const rangeWidth = maxValue - minValue;
+        const minPercent = ((minVal - minValue) / rangeWidth) * 100;
+        const maxPercent = ((maxVal - minValue) / rangeWidth) * 100;
+
+        // Update fill
+        rangeFill.style.left = minPercent + '%';
+        rangeFill.style.right = (100 - maxPercent) + '%';
+
+        // Update handles
+        handleMin.style.left = minPercent + '%';
+        handleMax.style.right = (100 - maxPercent) + '%';
+
+        // Update input fields
+        minInput.value = minVal;
+        maxInput.value = maxVal;
+      }
+
+      // Update on range input
+      minRange.addEventListener('input', updateSlider);
+      maxRange.addEventListener('input', updateSlider);
+
+      // Update on text input
+      minInput.addEventListener('input', () => {
+        let value = parseInt(minInput.value) || minValue;
+        if (value < minValue) value = minValue;
+        if (value > maxRange.value - minGap) value = maxRange.value - minGap;
+        minRange.value = value;
+        updateSlider();
+      });
+
+      maxInput.addEventListener('input', () => {
+        let value = parseInt(maxInput.value) || maxValue;
+        if (value > maxValue) value = maxValue;
+        if (value < parseInt(minRange.value) + minGap) value = parseInt(minRange.value) + minGap;
+        maxRange.value = value;
+        updateSlider();
+      });
+
+      // Initial update
+      updateSlider();
+    }
+
+    // Initialize Year Slider (2000 to 2025, min gap 1 year)
+    initRangeSlider('yearMinRange', 'yearMaxRange', 'yearRangeFill', 'yearHandleMin', 'yearHandleMax', 'yearMinInput', 'yearMaxInput', 1980, 2025, 1980, 2025, 1);
+
+    // Initialize Price Slider (1000 to 99999, min gap 500 CAD)
+    initRangeSlider('priceMinRange', 'priceMaxRange', 'priceRangeFill', 'priceHandleMin', 'priceHandleMax', 'priceMinInput', 'priceMaxInput', 1000, 99999, 1000, 99999, 500);
+
+    // Navigation Toggle
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    navToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+    });
+
+    // Show/Hide Back to Top Button and Navbar Scroll
+    window.onscroll = function() {
+      let backToTop = document.getElementById('back-to-top');
+      let navbar = document.getElementById('navbar');
+      if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+        backToTop.style.display = 'block';
+        navbar.classList.add('scrolled');
+      } else {
+        backToTop.style.display = 'none';
+        navbar.classList.remove('scrolled');
+      }
+    };
+
+    // Form Submission
+    document.getElementById('carSearchForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      console.log('Form submitted:', {
+        customerName: this.customerName.value,
+        customerEmail: this.customerEmail.value,
+        customerPhone: this.customerPhone.value,
+        brand: this.brand.value,
+        yearMin: document.getElementById('yearMinRange').value,
+        yearMax: document.getElementById('yearMaxRange').value,
+        priceMin: document.getElementById('priceMinRange').value,
+        priceMax: document.getElementById('priceMaxRange').value,
+        model: this.model.value,
+        mileageMin: this.mileageMin.value,
+        mileageMax: this.mileageMax.value,
+        transmission: this.transmission.value,
+        drivetrain: this.drivetrain.value,
+        seats: this.seats.value,
+        features: Array.from(this.features.selectedOptions).map(option => option.value),
+        termYears: this.termYears.value,
+        maxMonthly: this.maxMonthly.value,
+      });
+    });
+
+    // Carousel Functionality
+    const brandCarousel = document.getElementById('brandCarousel');
+    const brandLeft = document.getElementById('brandLeft');
+    const brandRight = document.getElementById('brandRight');
+    const bodyTypeCarousel = document.getElementById('bodyTypeCarousel');
+    const bodyTypeLeft = document.getElementById('bodyTypeLeft');
+    const bodyTypeRight = document.getElementById('bodyTypeRight');
+
+    function scrollCarousel(carousel, direction) {
+      const scrollAmount = 200;
+      carousel.scrollLeft += direction * scrollAmount;
+    }
+
+    brandLeft.addEventListener('click', () => scrollCarousel(brandCarousel, -1));
+    brandRight.addEventListener('click', () => scrollCarousel(brandCarousel, 1));
+    bodyTypeLeft.addEventListener('click', () => scrollCarousel(bodyTypeCarousel, -1));
+    bodyTypeRight.addEventListener('click', () => scrollCarousel(bodyTypeCarousel, 1));
+
+    // Brand Dropdown
+    const brandInput = document.getElementById('brandInput');
+    const brandDropdown = document.getElementById('brandDropdown');
+    const brands = [
+      "AC", "AC PROPULSION", "ACURA", "A.D. TRAMONTANA", "ALFA ROMEO", "ALMAC", "ALTERNATIVE CARS", "AMUZA", "ANTEROS", "ARASH",
+      "ARIEL", "ARRINERA", "ASL", "ASTERIO", "ASTON MARTIN", "AUDI", "BAC", "BAJAJ", "BEIJING AUTOMOBILE WORKS", "BENTLEY",
+      "BMW", "BOLLORÉ", "BOLWELL", "BRILLIANCE / HUACHEN", "BRISTOL", "BRITISH LEYLAND", "BRM BUGGY", "BROOKE", "BUDDY",
+      "BUFORI", "BUGATTI", "BUICK", "BYD", "CADILLAC", "CAPARO", "CARBONTECH", "CARICE", "CHANG'AN", "CHANGHE", "CHERY",
+      "CHEVROLET", "CHEVRON", "CITROËN", "CHRYSLER", "COMMUTER CARS", "CONNAUGHT", "COVINI", "DACIA", "DAIHATSU", "DATSUN",
+      "DE LA CHAPELLE", "DMC", "DIARDI", "DODGE", "DONKERVOORT", "DONGFENG", "DONTO", "DS AUTOMOBILES", "DYNASTI ELECTRIC CAR CORP.",
+      "E-VADE", "EFFEDI", "EGY-TECH ENGINEERING", "ELECTRIC RACEABOUT", "ELFIN", "EMGRAND", "ENGLON", "ETERNITI", "ETOX",
+      "EQUUS", "EXAGON", "FARALLI & MAZZANTI", "FAW", "FERRARI", "FIAT", "FISKER", "FODAY", "FORCE", "FORD", "FORD AUSTRALIA",
+      "FORD GERMANY", "FORNASARI", "FRASER", "GAC GROUP", "GALPIN", "GEELY", "GENESIS", "GIBBS", "GILLET", "GINETTA", "GMC",
+      "GONOW", "GREAT WALL / CHANGCHENG", "GREENTECH AUTOMOTIVE", "GRINNALL", "GTA MOTOR", "GUMPERT", "GURGEL", "HENNESSEY",
+      "HINDUSTAN", "HOLDEN", "HONDA", "HONGQI", "HRADYESH", "HTT TECHNOLOGIES", "HULME", "HYUNDAI", "ICML", "IFR", "IRAN KHODRO",
+      "IKCO", "IMPERIA", "INFINITI", "IVM", "INVICTA", "ISDERA", "ISUZU", "JAC", "JAGUAR", "JEEP", "JENSEN MOTORS", "JETCAR",
+      "JONWAY", "JOSS", "KAIPAN", "KANTANKA", "KARMA", "KOENIGSEGG", "KORRES", "KIA", "KIAT", "KISH KHODRO", "KTM", "LADA",
+      "LAMBORGHINI", "LANCIA", "LAND ROVER", "LANDWIND", "LARAKI", "LEBLANC", "LEITCH", "LEOPARD", "LEXUS", "LI-ION", "LIFAN",
+      "LIGHTNING", "LINCOLN", "LISTER", "LOCAL MOTORS", "LOBINI", "LOTEC", "LOTUS CARS", "LUCRA CARS", "LUXGEN", "MAHINDRA",
+      "MARUSSIA", "MARUTI SUZUKI", "MASERATI", "MASTRETTA", "MAZDA", "MCLAREN", "MERCEDES-BENZ", "MG", "MICRO", "MINI",
+      "MITSUBISHI", "MITSUOKA", "MORGAN", "MULLEN", "MYCAR", "MYVI-PERODUA", "NISSAN", "NOBLE", "NOTA", "OLDSMOBILE", "OPEL",
+      "OPTIMAL ENERGY", "ORCA", "OLTCIT", "PAGANI", "PANHARD", "PANOZ", "PERANA", "PERODUA", "PEUGEOT", "P.G.O.", "POLARSUN",
+      "PLYMOUTH", "PORSCHE", "PROTO", "OULLIM", "PROTON", "PURITALIA", "QOROS", "QVALE", "RADICAL", "RELIANT", "RENAULT",
+      "REVA", "RIMAC", "RINSPEED", "RODING", "ROEWE", "ROLLS-ROYCE", "ROSSIN-BERTIN", "ROSSION", "ROVER", "SAAB", "SALEEN",
+      "SAIC-GM-WULING", "SAIPA", "SAKER", "SAMSUNG", "SAN", "SBARRO", "SCION", "SEAT", "SHANGHAI MAPLE", "SIN", "ŠKODA",
+      "SMART", "SPADA VETTURE SPORT", "SPYKER", "SSANGYONG", "SSC NORTH AMERICA", "STREET & RACING TECHNOLOGY", "SUBARU",
+      "SUZUKI", "TANOM", "TATA", "TAURO", "TAWON CAR", "TD CARS", "TESLA", "THAI RUNG", "TOYOTA", "TREKKA", "TRIDENT",
+      "TRIUMPH", "TROLLER", "TRUMPCHI", "TUSHEK", "TVR", "TVS", "ULTIMA", "UMM", "UEV", "URI", "UAZ", "VAUXHALL MOTORS",
+      "VECTOR", "VENCER", "VENIRAUTO", "VENTURI", "VEPR", "VOLKSWAGEN", "VOLVO", "VINFAST", "W MOTORS", "WALLYSCAR",
+      "WESTFIELD", "WHEEGO", "WIESMANN", "XENIA", "YES!", "YOUABIAN PUMA", "ZASTAVA AUTOMOBILES", "ZENDER CARS", "ZENOS CARS",
+      "ZENVO", "ZIL", "ZX AUTO"
+    ];
+
+    brandInput.addEventListener('focus', () => {
+      brandDropdown.style.display = 'block';
+      brandDropdown.innerHTML = '';
+      brands.forEach(brand => {
+        const div = document.createElement('div');
+        div.className = 'dropdown-item';
+        div.textContent = brand;
+        div.addEventListener('click', () => {
+          brandInput.value = brand;
+          brandDropdown.style.display = 'none';
+        });
+        brandDropdown.appendChild(div);
+      });
+    });
+
+    brandInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        brandDropdown.style.display = 'none';
+      }, 200);
+    });
+
+    brandInput.addEventListener('input', () => {
+      const searchTerm = brandInput.value.toLowerCase();
+      brandDropdown.innerHTML = '';
+      const filteredBrands = brands.filter(brand => brand.toLowerCase().includes(searchTerm));
+      filteredBrands.forEach(brand => {
+        const div = document.createElement('div');
+        div.className = 'dropdown-item';
+        div.textContent = brand;
+        div.addEventListener('click', () => {
+          brandInput.value = brand;
+          brandDropdown.style.display = 'none';
+        });
+        brandDropdown.appendChild(div);
+      });
+      if (filteredBrands.length > 0) {
+        brandDropdown.style.display = 'block';
+      }
+    });
+
+
+
+    // ... (Keep existing range slider, navigation, carousel, and brand dropdown code) ...
+
+// Email Submission
+function sendEmail() {
+  const form = document.getElementById('carSearchForm');
+  const formData = {
+    customerName: form.customerName.value,
+    customerEmail: form.customerEmail.value,
+    customerPhone: form.customerPhone.value,
+    brand: form.brand.value,
+    yearMin: document.getElementById('yearMinRange').value,
+    yearMax: document.getElementById('yearMaxRange').value,
+    priceMin: document.getElementById('priceMinRange').value,
+    priceMax: document.getElementById('priceMaxRange').value,
+    model: form.model.value,
+    mileageMin: form.mileageMin.value,
+    mileageMax: form.mileageMax.value,
+    transmission: form.transmission.value,
+    drivetrain: form.drivetrain.value,
+    seats: form.seats.value,
+    features: Array.from(form.features.selectedOptions).map(option => option.value).join(', '),
+    termYears: form.termYears.value,
+    maxMonthly: form.maxMonthly.value,
+  };
+
+  // Construct email body
+  const subject = `Car Request from ${formData.customerName}`;
+  const body = `Customer Details:\nName: ${formData.customerName}\nEmail: ${formData.customerEmail}\nPhone: ${formData.customerPhone}\n\nSearch Criteria:\nBrand: ${formData.brand}\nYear Range: ${formData.yearMin} - ${formData.yearMax}\nPrice Range (CAD): ${formData.priceMin} - ${formData.priceMax}\nModel: ${formData.model}\nMileage Range (KM): ${formData.mileageMin} - ${formData.mileageMax}\nTransmission: ${formData.transmission}\nDrivetrain: ${formData.drivetrain}\nSeats: ${formData.seats}\nFeatures: ${formData.features}\nTerm Years: ${formData.termYears}\nMax Monthly (CAD): ${formData.maxMonthly}`;
+
+  // Open email client
+  window.location.href = `mailto:support@M&A ?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+// WhatsApp Submission
+function sendWhatsApp() {
+  const form = document.getElementById('carSearchForm');
+
+  const rawData = {
+    "Name": form.customerName.value.trim(),
+    "Phone Number": form.customerPhone.value.trim(),
+    "Brand": form.brand.value.trim(),
+    "Model": form.model.value.trim(),
+    "Year (Min)": document.getElementById('yearMinRange').value.trim(),
+    "Year (Max)": document.getElementById('yearMaxRange').value.trim(),
+    "Price (Min)": document.getElementById('priceMinRange').value.trim(),
+    "Price (Max)": document.getElementById('priceMaxRange').value.trim(),
+    "Mileage (Min)": form.mileageMin.value.trim(),
+    "Mileage (Max)": form.mileageMax.value.trim(),
+    "Transmission": form.transmission.value.trim(),
+    "Drivetrain": form.drivetrain.value.trim(),
+    "Seats": form.seats.value.trim(),
+    "Features": Array.from(form.features.selectedOptions).map(option => option.value).join(', ').trim(),
+    "Term (Years)": form.termYears.value.trim(),
+    "Max Monthly Payment": form.maxMonthly.value.trim()
+  };
+
+  // Filter out empty values
+  const filteredData = Object.entries(rawData)
+    .filter(([_, value]) => value !== '')
+    .map(([key, value]) => `${key}: ${value}`)
+    .join('\n');
+
+  // Encode the message
+  const message = encodeURIComponent(filteredData);
+
+  // Correct WhatsApp number in international format
+  const phone = '13439977144';
+
+  // Build the WhatsApp link
+  const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
+
+  // Open WhatsApp with the filled message
+  window.open(whatsappUrl, '_blank');
+}
+
+
+// ... (Keep existing carousel and brand dropdown event listeners) ...
+
+
+
+  </script>
+</body>
+</html>
