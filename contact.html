@@ -48,7 +48,30 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <meta name="msapplication-TileImage" content="ms-icon-144x144.png">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="M&A Motors - Premium Car Purchase">
+  <meta property="og:description" content="Find your dream car in Canada with M&A Motors. Fast, free, and personalized car search and financing services.">
+  <meta property="og:image" content="apple-touch-icon.png">
+  <meta property="og:url" content="https://Halalauto.ca">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="M&A Motors">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="M&A Motors - Premium Car Purchase">
+  <meta name="twitter:description" content="Find your dream car in Canada with M&A Motors. Fast, free, and personalized car search and financing services.">
+  <meta name="twitter:image" content="apple-touch-icon.png">
+  <meta name="twitter:site" content="@YourTwitterHandle">
+  
   <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: #1A2238;
@@ -318,15 +341,14 @@
           <div class="max-w-md md:max-w-3xl mx-auto mt-6">
 
 
-
             <div class="mt-12 lg:mt-16 flex flex-wrap max-lg:justify-center gap-6">
               <div class="rounded-md shadow-sm">
               </div>
               <div>
-                <button
+                <a href="#location"
                   class="w-full flex items-center justify-center px-8 py-4 font-medium text-base tracking-wide rounded-full text-white bg-indigo-500 hover:bg-indigo-400 transition border-0 cursor-pointer">
                   Get Started
-                </button>
+                </a>
               </div>
             </div>
           </div>
@@ -354,7 +376,7 @@
                 data-original="#000000" />
             </svg>
             <a href="javascript:void(0)" class="text-white text-sm ml-4">
-                 Info@Halalauto.ca
+              Info@Halalauto.ca
             </a>
           </li>
           <li class="flex items-center">
@@ -702,7 +724,7 @@ text-muted-400/20 animate-wheel">
           </svg>
         </div>
 
-        <div class="relative w-full max-w-7xl mx-auto px-5 py-24 z-20">
+        <div id="location" class="relative w-full max-w-7xl mx-auto px-5 py-24 z-20">
           <h2 class="text-4xl font-bold text-center mb-12 animate__animated animate__fadeInUp">Visit
             <span class="gradient-text">Our Location</span>
           </h2>
@@ -764,7 +786,8 @@ text-muted-400/20 animate-wheel">
           <li><a href="cars.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300">(343) 997-7144</a>
           </li>
           <li><a href="about.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300">About Us</a></li>
-          <li><a href="Info@Halalauto.ca.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300">Info@Halalauto.ca</a></li>
+          <li><a href="Info@Halalauto.ca.html"
+              class="text-gray-400 hover:text-[#4B6BFB] transition duration-300">Info@Halalauto.ca</a></li>
           <li><a href="financing.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300">Financing a
               Car</a></li>
           <li><a href="policy.html" class="text-gray-400 hover:text-[#4B6BFB] transition duration-300"></a></li>
