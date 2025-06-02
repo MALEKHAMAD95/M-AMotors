@@ -10,7 +10,7 @@ import {
 const navigation = [
     { label: 'Basic Info', value: 'overview', icon: <TbFileInfo /> },
     { label: 'Specifications', value: 'tasks', icon: <TbChecklist /> },
-    { label: 'Specifications', value: 'attachments', icon: <TbPaperclip /> },
+    { label: 'Car Option', value: 'attachments', icon: <TbPaperclip /> },
     { label: 'Specifications', value: 'activity', icon: <TbCalendarStats /> },
     { label: 'Specifications', value: 'settings', icon: <TbSettings /> },
 ]

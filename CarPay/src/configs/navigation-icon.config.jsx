@@ -1,16 +1,15 @@
 import {
     PiHouseLineDuotone,
-    PiArrowsInDuotone,
     PiBookOpenUserDuotone,
     PiBookBookmarkDuotone,
     PiAcornDuotone,
     PiBagSimpleDuotone,
 } from 'react-icons/pi'
-
+import { GiCityCar } from "react-icons/gi";
 const navigationIcon = {
     home: <PiHouseLineDuotone />,
     singleMenu: <PiAcornDuotone />,
-    collapseMenu: <PiArrowsInDuotone />,
+    Cars: <GiCityCar  />,
     groupSingleMenu: <PiBookOpenUserDuotone />,
     groupCollapseMenu: <PiBookBookmarkDuotone />,
     groupMenu: <PiBagSimpleDuotone />,

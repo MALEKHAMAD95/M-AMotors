@@ -27,17 +27,17 @@ const navigationConfig = [
         subMenu: [],
     },
     {
-        key: 'collapseMenu',
+        key: 'Cars',
         path: '',
-        title: 'Collapse Menu',
-        translateKey: 'nav.collapseMenu.collapseMenu',
-        icon: 'collapseMenu',
+        title: 'Cars',
+        translateKey: 'nav.Cars.Cars',
+        icon: 'Cars',
         type: NAV_ITEM_TYPE_COLLAPSE,
         authority: [],
         subMenu: [
             
             {
-                key: 'collapseMenu.item1',
+                key: 'Cars.item1',
                 path: '/Cars',
                 title: 'Cars',
                 translateKey: 'nav.Cars',
@@ -47,10 +47,10 @@ const navigationConfig = [
                 subMenu: [],
             },
             {
-                key: 'collapseMenu.item2',
+                key: 'Cars.item2',
                 path: '/collapse-menu-item-view-2',
                 title: 'Collapse menu item 2',
-                translateKey: 'nav.collapseMenu.item2',
+                translateKey: 'nav.Cars.item2',
                 icon: '',
                 type: NAV_ITEM_TYPE_ITEM,
                 authority: [],
