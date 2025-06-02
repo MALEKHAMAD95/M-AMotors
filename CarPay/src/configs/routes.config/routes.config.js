@@ -27,13 +27,13 @@ export const protectedRoutes = [
     },
 
     {
-        key: 'collapseMenu.item1',
+        key: 'Cars.item1',
         path: '/collapse-menu-item-view-1',
         component: lazy(() => import('@/views/demo/CollapseMenuItemView1')),
         authority: [],
     },
     {
-        key: 'collapseMenu.item2',
+        key: 'Cars.item2',
         path: '/collapse-menu-item-view-2',
         component: lazy(() => import('@/views/demo/CollapseMenuItemView2')),
         authority: [],

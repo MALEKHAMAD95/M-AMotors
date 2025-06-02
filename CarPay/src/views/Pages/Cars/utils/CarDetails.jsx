@@ -7,6 +7,7 @@ import useSWR from 'swr'
 import { useParams } from 'react-router-dom'
 import CarBasicInfoPage from '../CarBasicInfoPage'
 import CarSpecificationsPage from '../CarSpecificationsPage'
+import CarOptionPage from '../CarOptionPage'
 
 const defaultNavValue = 'overview'
 const settingsNavValue = 'settings'
@@ -78,7 +79,7 @@ const ProjectDetails = () => {
                                     <div> <CarBasicInfoPage/> </div>
                                 )}
                                 {selectedNav === 'tasks' && <div> <CarSpecificationsPage/> </div>}
-                                {selectedNav === 'attachments' && <div> 5</div>}
+                                {selectedNav === 'attachments' && <div>  <CarOptionPage/></div>}
                                 {selectedNav === 'activity' && <div> 666</div>}
                                 {selectedNav === 'settings' && (
                                     <div> 2323232</div>
